@@ -106,26 +106,6 @@ namespace ClearSky
             }
             transform.position += moveVelocity * movePower * Time.deltaTime;
         }
-        //void Jump()
-        //{
-        //    if ((Input.GetButtonDown("Jump") || Input.GetAxisRaw("Vertical") > 0)
-        //    && !anim.GetBool("isJump"))
-        //    {
-        //        isJumping = true;
-        //        anim.SetBool("isJump", true);
-        //    }
-        //    if (!isJumping)
-        //    {
-        //        return;
-        //    }
-
-        //    rb.velocity = Vector2.zero;
-
-        //    Vector2 jumpVelocity = new Vector2(0, jumpPower);
-        //    rb.AddForce(jumpVelocity, ForceMode2D.Impulse);
-
-        //    isJumping = false;
-        //}
         void Attack()
         {
             if (Input.GetKeyDown(KeyCode.Q))
@@ -135,13 +115,11 @@ namespace ClearSky
             // Kiểm tra kẻ địch trong tầm đánh
             Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(transform.position, attackRange, enemyLayers);
 
-            //// Gây sát thương lên kẻ địch
+            // Gây sát thương lên kẻ địch
             //foreach (Collider2D enemy in hitEnemies)
-            //{
-            //    Debug.Log("We hit " + enemy.name);
-            //    // Gọi hàm gây sát thương cho kẻ địch
-            //    enemy.GetComponent<Enemy>().TakeDamage(10);
-            //}
+            //    {
+            //        enemy.GetComponent<EnemyStats>().TakeDamage(attackEffect.GetComponent<AttackEffect>().damage);
+            //    }
         }
         //void Hurt()
         //{
