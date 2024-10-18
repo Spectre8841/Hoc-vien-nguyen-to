@@ -83,11 +83,5 @@ namespace ClearSky
             anim.SetBool("isRun", true);
 
         }
-        //public void Jump()
-        //{
-        //    ResetAnimation();
-        //    anim.SetBool("isJump", true);
-
-        //}
     }
 }
