@@ -2,27 +2,31 @@
 using System.Collections.Generic;
 using UnityEngine;
 using ClearSky;
+using System;
+using static UnityEngine.EventSystems.EventTrigger;
 
 namespace ClearSky
 {
     public class SimplePlayerController : MonoBehaviour
     {
         public float movePower = 10f;
-        //public float jumpPower = 15f; //Set Gravity Scale in Rigidbody2D Component to 5
-        //public float moveSpeed = 5f;
         public float dashSpeed = 2000f;
         public float dashDuration = 0.2f;
         private bool isDashing = false;
 
         private Rigidbody2D rb;
         private Animator anim;
+        private PlayerStats playerStats; // Thêm tham chiếu tới PlayerStats
         Vector3 movement;
         private int direction = 1;
         //bool isJumping = false;
         private bool alive = true;
         public GameObject attackEffect; // Thêm hiệu ứng cho đòn đánh chay
         public float attackRange = 1f;
+        public float attackRate = 0.2f; // Kho?ng th?i gian gi?a các ?òn ?ánh
+        private float nextAttackTime = 0f;
         public LayerMask enemyLayers;
+        public Transform attackPoint;
 
         public GameObject fireballPrefab; // Kỹ năng 1: Fireball
         public Transform firePoint; // Điểm xuất phát của kỹ năng Fireball
@@ -34,6 +38,9 @@ namespace ClearSky
         public GameObject lightningPrefab; // Kỹ năng 3: Lightning Strike
         public float strikeCooldown = 10f; // Thời gian hồi chiêu của kỹ năng
         private float nextStrikeTime = 0f;
+        public float attackCooldown = 0.5f; // Thời gian giữa các đòn đánh (0.5 giây)
+        private bool isCooldown = false; // Để kiểm tra nếu đòn đánh đang trong thời gian hồi chiêu
+        public Weapon weapon; // Tham chiếu tới vũ khí
 
 
         // Start is called before the first frame update
@@ -41,6 +48,7 @@ namespace ClearSky
         {
             rb = GetComponent<Rigidbody2D>();
             anim = GetComponent<Animator>();
+            playerStats = GetComponent<PlayerStats>(); // Khởi tạo tham chiếu đến PlayerStats
         }
 
         private void Update()
@@ -52,7 +60,6 @@ namespace ClearSky
                 Die();
                 Attack();
                 UseSkills();
-                //Jump();
                 Run();
                 if (Input.GetKeyDown(KeyCode.LeftShift) && !isDashing)
                 {
@@ -60,12 +67,28 @@ namespace ClearSky
                 }
             }
         }
+
         private void OnTriggerEnter2D(Collider2D other)
         {
-            anim.SetBool("isJump", false);
+            // Nếu va chạm với quái (kẻ thù)
+            if (other.gameObject.CompareTag("Enemy"))
+            {
+                playerStats.TakeDamage(10f); // Nhận 10 sát thương từ quái
+                StartCoroutine(HurtAndRecover()); // Gọi Coroutine để xử lý Hurt và trở về trạng thái bình thường
+                //Hurt(); // Gọi hàm Hurt để chuyển sang trạng thái bị thương
+            }
         }
+        private IEnumerator HurtAndRecover()
+        {
+            // Kích hoạt trạng thái hurt
+            anim.SetTrigger("hurt");
 
+            // Chờ một khoảng thời gian trước khi trở về trạng thái idle (ví dụ 0.5 giây)
+            yield return new WaitForSeconds(0.5f);
 
+            // Trở về trạng thái idle sau khoảng thời gian chờ
+            anim.SetTrigger("idle");
+        }
         void Run()
         {
             Vector3 moveVelocity = Vector3.zero;
@@ -108,30 +131,53 @@ namespace ClearSky
         }
         void Attack()
         {
-            if (Input.GetKeyDown(KeyCode.Q))
+            if (Input.GetKeyDown(KeyCode.Q) && !isCooldown)
             {
-                anim.SetTrigger("attack");  
-            }
-            // Kiểm tra kẻ địch trong tầm đánh
-            Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(transform.position, attackRange, enemyLayers);
+                isCooldown = true;
+                anim.SetTrigger("attack");
+                weapon.Attack();
+                //// Tìm kẻ địch trong tầm tấn công
+                //Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayers);
+                Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayers);
 
-            // Gây sát thương lên kẻ địch
-            //foreach (Collider2D enemy in hitEnemies)
-            //    {
-            //        enemy.GetComponent<EnemyStats>().TakeDamage(attackEffect.GetComponent<AttackEffect>().damage);
-            //    }
+                // Gây sát thương lên kẻ địch
+                foreach (Collider2D enemy in hitEnemies)
+                {
+                    Debug.Log("Đã tấn công quái: " + enemy.name);
+                    //enemy.GetComponent<EnemyStats>().TakeDamage(playerStats.attackDamage); // Sử dụng sát thương từ PlayerStats
+                    EnemyStats enemyStats = enemy.GetComponent<EnemyStats>();
+                    if (enemyStats != null)
+                    {
+                        enemyStats.TakeDamage(playerStats.attackDamage);
+                    }
+                }
+
+                StartCoroutine(ResetAttackCooldown());
+            }
         }
-        //void Hurt()
-        //{
-        //    if (Input.GetKeyDown(KeyCode.Alpha2))
-        //    {
-        //        anim.SetTrigger("hurt");
-        //        if (direction == 1)
-        //            rb.AddForce(new Vector2(-5f, 1f), ForceMode2D.Impulse);
-        //        else
-        //            rb.AddForce(new Vector2(5f, 1f), ForceMode2D.Impulse);
-        //    }
-        //}
+        // Hồi chiêu sau khi đánh
+        IEnumerator ResetAttackCooldown()
+        {
+            yield return new WaitForSeconds(attackCooldown);
+            isCooldown = false;
+        }
+
+        // Hàm này để vẽ hình tròn biểu diễn phạm vi tấn công khi bạn phát triển trong Unity Editor
+        void OnDrawGizmosSelected()
+        {
+            Gizmos.DrawWireSphere(attackPoint.position, attackRange);
+        }
+
+        void Hurt()
+        {
+            anim.SetTrigger("hurt");
+            playerStats.TakeDamage(10f); // Gọi phương thức TakeDamage từ PlayerStats
+            if (direction == 1)
+                rb.AddForce(new Vector2(-5f, 1f), ForceMode2D.Impulse);
+            else
+                rb.AddForce(new Vector2(5f, 1f), ForceMode2D.Impulse);
+        }
+
         void Die()
         {
             if (Input.GetKeyDown(KeyCode.Alpha3))

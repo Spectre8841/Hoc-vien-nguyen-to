@@ -45,7 +45,33 @@ public class EnemyAI : MonoBehaviour
             isChasing = false;
             isAttacking = false;
         }
+        // Cập nhật hoạt ảnh
+        UpdateAnimations();
 
+        //// Nếu quái đang đuổi theo nhân vật chính
+        //if (isChasing)
+        //{
+        //    ChasePlayer();
+        //    animator.SetBool("isRunning", true);
+        //}
+        //else
+        //{
+        //    //isChasing = false;
+        //    //isAttacking = false;
+        //    animator.SetBool("isRunning", false); // Tắt animation chạy
+        //}
+        //// Nếu quái đang tấn công nhân vật chính
+        //if (isAttacking)
+        //{
+        //    animator.SetBool("isAttacking", true);  // Kích hoạt animation tấn công
+        //}
+        //else
+        //{
+        //    animator.SetBool("isAttacking", false); // Tắt animation tấn công
+        //}
+    }
+    void UpdateAnimations()
+    {
         // Nếu quái đang đuổi theo nhân vật chính
         if (isChasing)
         {
@@ -54,25 +80,24 @@ public class EnemyAI : MonoBehaviour
         }
         else
         {
-            //isChasing = false;
-            //isAttacking = false;
-            animator.SetBool("isRunning", false); // Tắt animation chạy
+            animator.SetBool("isRunning", false);  // Tắt hoạt ảnh chạy nếu không đuổi theo
         }
+
         // Nếu quái đang tấn công nhân vật chính
         if (isAttacking)
         {
-            animator.SetBool("isAttacking", true);  // Kích hoạt animation tấn công
+            animator.SetBool("isAttacking", true);  // Kích hoạt hoạt ảnh tấn công
         }
         else
         {
-            animator.SetBool("isAttacking", false); // Tắt animation tấn công
+            animator.SetBool("isAttacking", false);  // Tắt hoạt ảnh tấn công
         }
     }
 
     void ChasePlayer()
     {
         // Di chuyển về phía nhân vật chính
-        animator.SetBool("run1", true); // Kích hoạt animation chạy
+        //animator.SetBool("run1", true); // Kích hoạt animation chạy
         animator.SetTrigger("run1");
         Vector2 direction = (player.position - transform.position).normalized;
         transform.position = Vector2.MoveTowards(transform.position, player.position, moveSpeed * Time.deltaTime);
@@ -99,10 +124,11 @@ public class EnemyAI : MonoBehaviour
     void ResetAttack()
     {
         canAttack = true; // Cho phép tấn công lại sau thời gian chờ
-        animator.ResetTrigger("attackeye"); // Reset trigger tấn công
+        //animator.ResetTrigger("attackeye"); // Reset trigger tấn công
     }
     public void TakeDamage(float damage)
     {
+        if (isDead) return;  // Không nhận sát thương nếu đã chết
         health -= damage;
 
         // Nếu quái bị đánh trúng nhưng chưa chết
@@ -120,7 +146,7 @@ public class EnemyAI : MonoBehaviour
         isDead = true;
         animator.SetTrigger("die1"); // Kích hoạt animation chết
         // Thêm logic để xử lý sau khi quái chết (ví dụ: phá hủy đối tượng sau một khoảng thời gian)
-        Destroy(gameObject, 2f); // Xóa quái sau 2 giây
+        Destroy(gameObject, 1f); // Xóa quái sau 1 giây
     }
 }
 

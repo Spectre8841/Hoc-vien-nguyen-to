@@ -5,11 +5,12 @@ TagManager:
   serializedVersion: 2
   tags:
   - Enemy
+  - 15 Staff
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Enemy1
   - Water
   - UI
   - 

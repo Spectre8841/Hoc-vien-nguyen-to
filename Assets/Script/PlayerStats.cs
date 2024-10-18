@@ -66,6 +66,10 @@ public class PlayerStats : MonoBehaviour
         {
             Die();
         }
+        else
+        {
+            anim.SetTrigger("hurt"); // Nếu chưa chết, chuyển sang trạng thái hurt
+        }
     }
 
     // Hồi máu cho nhân vật
