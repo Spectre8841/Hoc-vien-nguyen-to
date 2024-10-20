@@ -4,6 +4,7 @@ using UnityEngine;
 using ClearSky;
 using System;
 using static UnityEngine.EventSystems.EventTrigger;
+using UnityEngine.UI;
 
 namespace ClearSky
 {
@@ -22,18 +23,32 @@ namespace ClearSky
         //bool isJumping = false;
         private bool alive = true;
         public GameObject attackEffect; // Thêm hiệu ứng cho đòn đánh chay
-        public float attackRange = 1f;
+        public float attackRange = 3f;
+        public float attackRange1 = 10f;
         public float attackRate = 0.2f; // Kho?ng th?i gian gi?a các ?òn ?ánh
-        private float nextAttackTime = 0f;
+        //private float nextAttackTime = 0f;
         public LayerMask enemyLayers;
         public Transform attackPoint;
 
         public GameObject fireballPrefab; // Kỹ năng 1: Fireball
         public Transform firePoint; // Điểm xuất phát của kỹ năng Fireball
         public float fireballSpeed = 10f;
+        public float fireballCooldown = 3f; // Thời gian hồi chiêu cho kỹ năng Fireball
+        private float fireballNextTime; // Thời gian cho phép sử dụng lại kỹ năng Fireball
+        private bool isFireballCooldown = false; // Trạng thái hồi chiêu
+        public Image fireballCooldownImage; // Hình ảnh mô phỏng hồi chiêu
+        private float fireballCooldownTimer; // Timer để theo dõi thời gian hồi chiêu
 
-        public GameObject shieldPrefab; // Kỹ năng 2: Shield
-        public float shieldDuration = 5f; // Thời gian tồn tại của lá chắn
+        public GameObject fireAnimationPrefab; // Kỹ năng 2: Lửa
+        public Transform firePoint1; // Điểm xuất phát của kỹ năng Lửa
+        public float fireAnimationSpeed = 10f; // Tốc độ của lửa
+        public float burnDuration = 5f; // Thời gian thiêu đốt
+        public float burnDamage = 2f; // Sát thương mỗi giây
+        public Image fireCooldownImage; // Hình ảnh mô phỏng hồi chiêu cho kỹ năng Lửa
+        private float fireNextTime; // Thời gian cho phép sử dụng lại kỹ năng Lửa
+        private bool isFireCooldown = false; // Trạng thái hồi chiêu
+        private float fireCooldown = 4f; // Thời gian hồi chiêu cho kỹ năng Lửa
+        private float fireCooldownTimer; // Timer để theo dõi thời gian hồi chiêu
 
         public GameObject lightningPrefab; // Kỹ năng 3: Lightning Strike
         public float strikeCooldown = 10f; // Thời gian hồi chiêu của kỹ năng
@@ -64,6 +79,40 @@ namespace ClearSky
                 if (Input.GetKeyDown(KeyCode.LeftShift) && !isDashing)
                 {
                     StartCoroutine(Dash());
+                }
+                if (isFireballCooldown)
+                {
+                    if (Time.time >= fireballNextTime)
+                    {
+                        isFireballCooldown = false; // Kỹ năng có thể sử dụng lại
+                        fireballCooldownImage.fillAmount = 0; // Reset hình ảnh
+                    }
+                    else
+                    {
+                        // Cập nhật thời gian hồi chiêu
+                        fireballCooldownTimer = (fireballNextTime - Time.time) / fireballCooldown; // Tính toán tỷ lệ hồi chiêu
+                        fireballCooldownImage.fillAmount = fireballCooldownTimer; // Cập nhật tỷ lệ hồi chiêu cho hình ảnh
+                    }
+                }
+                // Kiểm tra trạng thái hồi chiêu cho kỹ năng FireAnimation
+                if (isFireCooldown)
+                {
+                    if (Time.time >= fireNextTime)
+                    {
+                        isFireCooldown = false; // Kỹ năng có thể sử dụng lại
+                        fireCooldownImage.fillAmount = 0; // Reset hình ảnh
+                    }
+                    else
+                    {
+                        // Cập nhật thời gian hồi chiêu
+                        fireCooldownTimer = (fireNextTime - Time.time) / fireCooldown; // Tính toán tỷ lệ hồi chiêu
+                        fireCooldownImage.fillAmount = fireCooldownTimer; // Mờ dần hình ảnh (giảm fillAmount)
+                    }
+                }
+                else
+                {
+                    // Reset hình ảnh khi không hồi chiêu
+                    fireCooldownImage.fillAmount = 0; // Reset hình ảnh
                 }
             }
         }
@@ -189,26 +238,142 @@ namespace ClearSky
         // Kỹ năng 1: Fireball (R)
         void CastFireball()
         {
-            anim.SetTrigger("attack");
+            // Kiểm tra xem kỹ năng có đang hồi chiêu không
+            if (isFireballCooldown)
+            {
+                Debug.Log("Kỹ năng Fireball đang hồi chiêu!");
+                return; // Nếu đang hồi chiêu, không thực hiện
+            }
+            //anim.SetTrigger("fireball"); // Kích hoạt animation
+
+            // Tạo quả cầu lửa từ prefab tại vị trí firePoint
             GameObject fireball = Instantiate(fireballPrefab, firePoint.position, firePoint.rotation);
             Rigidbody2D rbFireball = fireball.GetComponent<Rigidbody2D>();
-            rbFireball.velocity = firePoint.right * fireballSpeed;
+
+            // Tìm quái gần nhất
+            GameObject closestEnemy = FindClosestEnemy();
+
+            if (closestEnemy != null)
+            {
+                // Hướng về quái gần nhất
+                Vector2 direction = (closestEnemy.transform.position - firePoint.position).normalized;
+                rbFireball.velocity = direction * fireballSpeed;
+            }
+            else
+            {
+                // Nếu không có quái gần, quả cầu lửa bay thẳng
+                rbFireball.velocity = firePoint.right * fireballSpeed;
+            }
+
+            // Thêm Collider để xử lý va chạm
+            fireball.GetComponent<Collider2D>().isTrigger = true; // Đảm bảo quả cầu lửa có thể va chạm với các đối tượng
+            // Bắt đầu thời gian hồi chiêu
+            isFireballCooldown = true;
+            fireballNextTime = Time.time + fireballCooldown; // Đặt thời gian hồi chiêu
+        }
+
+        GameObject FindClosestEnemy()
+        {
+            // Lấy tất cả các quái trong phạm vi xung quanh firePoint
+            Collider2D[] enemies = Physics2D.OverlapCircleAll(firePoint.position, attackRange1, enemyLayers);
+
+            if (enemies.Length == 0)
+            {
+                return null; // Không có quái
+            }
+
+            GameObject closestEnemy = null;
+            float closestDistance = Mathf.Infinity;
+
+            foreach (Collider2D enemy in enemies)
+            {
+                float distanceToEnemy = Vector2.Distance(firePoint.position, enemy.transform.position);
+                if (distanceToEnemy < closestDistance)
+                {
+                    closestDistance = distanceToEnemy;
+                    closestEnemy = enemy.gameObject;
+                }
+            }
+
+            return closestEnemy;
         }
 
         // Kỹ năng 2: Shield (F)
-        void ActivateShield()
+        void CastFireAnimation()
         {
-            anim.SetTrigger("attack");
-            GameObject shield = Instantiate(shieldPrefab, transform.position, Quaternion.identity, transform);
-            Destroy(shield, shieldDuration);
+            // Kiểm tra xem kỹ năng có đang hồi chiêu không
+            if (isFireCooldown)
+            {
+                Debug.Log("Kỹ năng Lửa đang hồi chiêu!");
+                return; // Nếu đang hồi chiêu, không thực hiện
+            }
+
+            // Kích hoạt animation
+            //anim.SetTrigger("fireAnimation");
+
+            // Tạo kỹ năng lửa từ prefab tại vị trí firePoint
+            GameObject fireAnimation = Instantiate(fireAnimationPrefab, firePoint.position, firePoint.rotation);
+            Rigidbody2D rbFireAnimation = fireAnimation.GetComponent<Rigidbody2D>();
+
+            // Tìm quái gần nhất
+            GameObject closestEnemy = FindClosestEnemy1();
+
+            if (closestEnemy != null)
+            {
+                // Hướng về quái gần nhất
+                Vector2 direction = (closestEnemy.transform.position - firePoint.position).normalized;
+                rbFireAnimation.velocity = direction * fireAnimationSpeed;
+
+                // Gọi hàm để tạo vùng thiêu đốt khi va chạm
+                FireArea fireArea = fireAnimation.GetComponent<FireArea>();
+                if (fireArea != null)
+                {
+                    fireArea.Initialize(closestEnemy.transform, burnDuration, burnDamage);
+                }
+            }
+            else
+            {
+                // Nếu không có quái gần, quả cầu lửa bay thẳng
+                rbFireAnimation.velocity = firePoint.right * fireAnimationSpeed;
+            }
+
+            // Bắt đầu hồi chiêu
+            isFireCooldown = true;
+            fireNextTime = Time.time + fireCooldown;
         }
 
-        // Kỹ năng 3: Lightning Strike (V)
-        void CastLightningStrike()
+        GameObject FindClosestEnemy1()
+        {
+            // Lấy tất cả các quái trong phạm vi xung quanh firePoint
+            Collider2D[] enemies = Physics2D.OverlapCircleAll(firePoint.position, attackRange1, enemyLayers);
+
+            if (enemies.Length == 0)
+            {
+                return null; // Không có quái
+            }
+
+            GameObject closestEnemy = null;
+            float closestDistance = Mathf.Infinity;
+
+            foreach (Collider2D enemy in enemies)
+            {
+                float distanceToEnemy = Vector2.Distance(firePoint.position, enemy.transform.position);
+                if (distanceToEnemy < closestDistance)
+                {
+                    closestDistance = distanceToEnemy;
+                    closestEnemy = enemy.gameObject;
+                }
+            }
+
+            return closestEnemy;
+        }
+
+            // Kỹ năng 3: Lightning Strike (V)
+            void CastLightningStrike()
         {
             if (Time.time >= nextStrikeTime)
             {
-                anim.SetTrigger("attack");
+                anim.SetTrigger("lookat");
                 Vector3 targetPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 targetPosition.z = 0;
                 Instantiate(lightningPrefab, targetPosition, Quaternion.identity);
@@ -225,7 +390,7 @@ namespace ClearSky
             }
             if (Input.GetKeyDown(KeyCode.F))
             {
-                ActivateShield();
+                CastFireAnimation();
             }
             if (Input.GetKeyDown(KeyCode.V))
             {

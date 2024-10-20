@@ -80,12 +80,6 @@ public class PlayerStats : MonoBehaviour
         UpdateHealthBar();
     }
 
-    // Gây sát thương cho kẻ địch
-    //public void DealDamage(EnemyStats enemy)
-    //{
-    //    enemy.TakeDamage(attackDamage);
-    //}
-
     // Hàm xử lý khi nhân vật chết
     // Cập nhật thanh máu
     void UpdateHealthBar()

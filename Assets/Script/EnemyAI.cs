@@ -47,28 +47,6 @@ public class EnemyAI : MonoBehaviour
         }
         // Cập nhật hoạt ảnh
         UpdateAnimations();
-
-        //// Nếu quái đang đuổi theo nhân vật chính
-        //if (isChasing)
-        //{
-        //    ChasePlayer();
-        //    animator.SetBool("isRunning", true);
-        //}
-        //else
-        //{
-        //    //isChasing = false;
-        //    //isAttacking = false;
-        //    animator.SetBool("isRunning", false); // Tắt animation chạy
-        //}
-        //// Nếu quái đang tấn công nhân vật chính
-        //if (isAttacking)
-        //{
-        //    animator.SetBool("isAttacking", true);  // Kích hoạt animation tấn công
-        //}
-        //else
-        //{
-        //    animator.SetBool("isAttacking", false); // Tắt animation tấn công
-        //}
     }
     void UpdateAnimations()
     {
@@ -96,8 +74,6 @@ public class EnemyAI : MonoBehaviour
 
     void ChasePlayer()
     {
-        // Di chuyển về phía nhân vật chính
-        //animator.SetBool("run1", true); // Kích hoạt animation chạy
         animator.SetTrigger("run1");
         Vector2 direction = (player.position - transform.position).normalized;
         transform.position = Vector2.MoveTowards(transform.position, player.position, moveSpeed * Time.deltaTime);
