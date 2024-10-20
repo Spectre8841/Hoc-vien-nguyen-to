@@ -84,7 +84,7 @@ public class EnemyAI : MonoBehaviour
         if (canAttack)
         {
             // Gây sát thương cho nhân vật chính
-            animator.SetTrigger("attackeye");
+            //animator.SetTrigger("attackeye");
             PlayerStats playerStats = player.GetComponent<PlayerStats>();
             if (playerStats != null)
             {

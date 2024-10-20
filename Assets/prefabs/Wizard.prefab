@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 3519501213902255122}
   - component: {fileID: 5323775335295455784}
   - component: {fileID: 5240465662996851117}
+  - component: {fileID: 9133959032748036755}
   m_Layer: 0
   m_Name: Wizard
   m_TagString: Player
@@ -190,13 +191,17 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   attackPoint: {fileID: 324229898543362697}
-  fireballPrefab: {fileID: 4105362945620786469}
-  firePoint: {fileID: 4105362945620786471}
+  fireballPrefab: {fileID: 2118592169601105489, guid: 045c5ba10cbd742459ed7aaa839c5de8, type: 3}
+  firePoint: {fileID: 324229898543362697}
   fireballSpeed: 10
   fireballCooldown: 3
   fireballCooldownImage: {fileID: 0}
-  shieldPrefab: {fileID: 0}
-  shieldDuration: 5
+  fireAnimationPrefab: {fileID: 4623510061802054255, guid: ea0e0ce6ac3d8554eb9fa40d2ff8ec70, type: 3}
+  firePoint1: {fileID: 324229898543362697}
+  fireAnimationSpeed: 10
+  burnDuration: 5
+  burnDamage: 10
+  fireCooldownImage: {fileID: 0}
   lightningPrefab: {fileID: 0}
   strikeCooldown: 10
   attackCooldown: 0.2
@@ -234,6 +239,19 @@ MonoBehaviour:
   attackDamage: 10
   manaRegenRate: 5
   healthRegenRate: 2
+  gameOverManager: {fileID: 0}
+--- !u!114 &9133959032748036755
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4105362945620786469}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63357efb28e901343af08b8f816fc021, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &4105362946132217688
 PrefabInstance:
   m_ObjectHideFlags: 0

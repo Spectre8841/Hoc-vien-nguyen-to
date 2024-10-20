@@ -109,11 +109,6 @@ namespace ClearSky
                         fireCooldownImage.fillAmount = fireCooldownTimer; // Mờ dần hình ảnh (giảm fillAmount)
                     }
                 }
-                else
-                {
-                    // Reset hình ảnh khi không hồi chiêu
-                    fireCooldownImage.fillAmount = 0; // Reset hình ảnh
-                }
             }
         }
 
