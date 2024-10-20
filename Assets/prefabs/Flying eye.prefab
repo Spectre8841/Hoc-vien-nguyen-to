@@ -280,7 +280,7 @@ MonoBehaviour:
   detectionRange: 10
   moveSpeed: 2
   player: {fileID: 0}
-  attackRange: 1
+  attackRange: 0.1
   attackCooldown: 1
   health: 50
 --- !u!114 &6416735344573539498

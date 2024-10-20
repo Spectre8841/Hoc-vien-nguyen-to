@@ -38,7 +38,7 @@ public class EnemyStats : MonoBehaviour
         // Nếu quái bị đánh trúng nhưng chưa chết
         if (currentHealth > 0)
         {
-            animator.SetTrigger("takehit1"); // Kích hoạt animation bị đánh trúng
+            //animator.SetTrigger("takehit1"); // Kích hoạt animation bị đánh trúng
         }
         else if (!isDead)
         {

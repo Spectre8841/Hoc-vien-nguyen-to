@@ -15,6 +15,7 @@ public class PlayerStats : MonoBehaviour
 
     public float manaRegenRate = 5f;  // Tốc độ hồi phục mana mỗi giây
     public float healthRegenRate = 2f; // Tốc độ hồi phục máu mỗi giây (nếu có)
+    public GameOverManager gameOverManager; // Tham chiếu tới GameOverManager
 
     void Start()
     {
@@ -80,12 +81,6 @@ public class PlayerStats : MonoBehaviour
         UpdateHealthBar();
     }
 
-    // Gây sát thương cho kẻ địch
-    //public void DealDamage(EnemyStats enemy)
-    //{
-    //    enemy.TakeDamage(attackDamage);
-    //}
-
     // Hàm xử lý khi nhân vật chết
     // Cập nhật thanh máu
     void UpdateHealthBar()
@@ -103,6 +98,7 @@ public class PlayerStats : MonoBehaviour
         Debug.Log("Nhân vật đã chết!");
         anim.SetTrigger("die");
         // Thực hiện các hành động khác khi chết (ví dụ: game over, hồi sinh, v.v.)
+        gameOverManager.OnPlayerDeath();
     }
 }
 
