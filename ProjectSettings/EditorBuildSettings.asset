@@ -9,15 +9,15 @@ EditorBuildSettings:
     path: Assets/Scenes/SampleScene.unity
     guid: 2cda990e2423bbf4892e6590ba056729
   - enabled: 1
-    path: Assets/Scenes/hahaha.unity
-    guid: f46886fed490e4b4b814b027ade22223
-  - enabled: 1
-    path: Assets/Scenes/Main Menu.unity
-    guid: f38eb00fbba812b418a06ddfcd41395d
-  - enabled: 1
     path: Assets/Scenes 1/lv1.unity
     guid: e6f348f24a859e44f81ba98eb0de9749
   - enabled: 1
     path: Assets/Scenes 1/lv2.unity
     guid: 1f336e703c0072a4e83f545cb179ce5e
+  - enabled: 1
+    path: Assets/Scenes/hahaha.unity
+    guid: f46886fed490e4b4b814b027ade22223
+  - enabled: 1
+    path: Assets/Scenes/Main Menu.unity
+    guid: f38eb00fbba812b418a06ddfcd41395d
   m_configObjects: {}
