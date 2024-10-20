@@ -24,7 +24,7 @@ public class GameOverManager : MonoBehaviour
         Time.timeScale = 0.5f;
 
         // Tải lại scene đầu tiên (level 1)
-        SceneManager.LoadScene(3); // 0 là chỉ số của scene level 1 trong Build Settings
+        SceneManager.LoadScene(1); // 0 là chỉ số của scene level 1 trong Build Settings
     }
 }
 
