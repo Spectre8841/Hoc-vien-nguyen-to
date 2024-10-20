@@ -255,7 +255,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8345801313320324510, guid: 6e8723accd18d4143a077f6b55c8d40e, type: 3}
       propertyPath: nextSceneName
-      value: lv1
+      value: Main Menu
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
